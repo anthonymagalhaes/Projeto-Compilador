@@ -1,0 +1,9 @@
+program MeuPrimeiroCompilador;
+var x : integer;
+    y : integer;
+begin
+    x := 10;
+    y := -5 + x;
+
+    write("hello world")
+end.
