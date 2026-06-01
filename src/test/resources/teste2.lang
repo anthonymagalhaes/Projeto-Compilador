@@ -1,0 +1,9 @@
+program MeuPrimeiroCompilador;
+var x : integer;
+    y : integer;
+begin
+    x := 10;
+    y := -5 + x @;  /Erro de caractere inválido/
+
+    write("hello world")
+end.
