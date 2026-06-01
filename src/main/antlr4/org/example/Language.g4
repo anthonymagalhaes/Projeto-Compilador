@@ -109,7 +109,7 @@ IDENTIFIER : [a-z][a-z0-9]* {
     }
 ;
 
-WS: [ \t\r\n\u00A0]+ -> skip;
+WS: [ \t\r\n]+ -> skip;
 
 COMENTARIO: '/' ~[/]* '/' -> skip;
 
