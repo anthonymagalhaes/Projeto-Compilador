@@ -1,5 +1,5 @@
 grammar Language;
-
+@header { package org.example.gen;}
 @lexer::members{
     private void exibirErroLexico(){
         throw new RuntimeException(
