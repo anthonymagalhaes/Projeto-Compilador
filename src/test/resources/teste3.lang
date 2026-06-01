@@ -1,7 +1,7 @@
 program MeuPrimeiroCompilador;
 var x : integer;
 begin
-    x := 9; /Erro de exceder 2 bytes/
+    x := 99999; /Erro de exceder 2 bytes/
 
     write("hello world")
 end.
