@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            String files[] = args.length==0? new String[]{ "test." + EXTENSION } : args;
+            String files[] = args.length==0? new String[]{ "teste1." + EXTENSION } : args;
             CharStream in = CharStreams.fromFileName(DIRBASE + files[0]);
 
             LanguageLexer lexer = new LanguageLexer(in);
