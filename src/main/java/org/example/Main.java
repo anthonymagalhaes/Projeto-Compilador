@@ -48,7 +48,12 @@ public class Main {
             }
 
             LanguageParser parser = new LanguageParser(tokens);
-            parser.prog();
+
+            LanguageParser.ProgContext arvore = parser.prog();
+
+            LanguageCustomVisitor visitor = new LanguageCustomVisitor();
+
+            visitor.visit(arvore);
 
         } catch (RuntimeException | IOException e) {
             System.err.println(e.getMessage());
