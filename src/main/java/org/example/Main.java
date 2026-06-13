@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.IOException;
+import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -54,6 +55,18 @@ public class Main {
             LanguageCustomVisitor visitor = new LanguageCustomVisitor();
 
             visitor.visit(arvore);
+
+            GeradorCodigo gerador = new GeradorCodigo();
+            gerador.visit(arvore);
+            gerador.mostrarCodigo();
+
+            Otimizador otimizador = new Otimizador();
+            List<String> codigoOtimizado = otimizador.otimizar(gerador.getCodigo());
+            otimizador.mostrarOtimizado(codigoOtimizado);
+
+            GeradorAssembly geradorAsm = new GeradorAssembly();
+            geradorAsm.gerar(codigoOtimizado, visitor.getEscopoAtual().getTabelaMap());
+            geradorAsm.mostrarAssembly();
 
         } catch (RuntimeException | IOException e) {
             System.err.println(e.getMessage());

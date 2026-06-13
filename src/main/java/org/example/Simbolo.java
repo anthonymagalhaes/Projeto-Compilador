@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.enums.TipodeDado;
+
 public class Simbolo
 {
     private String nome;
@@ -12,7 +14,6 @@ public class Simbolo
         this.tipo = tipo;
         this.deslocamento = deslocamento;
     }
-    // Getters
     public String getNome() { return nome; }
     public TipodeDado getTipo() { return tipo; }
     public int getDeslocamento() { return deslocamento; }

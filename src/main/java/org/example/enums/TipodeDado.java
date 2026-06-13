@@ -1,8 +1,7 @@
-package org.example;
+package org.example.enums;
 
 public enum TipodeDado {
     INTEGER,
     BOOLEAN,
-    STRING,
-    VOID
+    STRING
 }

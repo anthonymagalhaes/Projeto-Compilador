@@ -1,0 +1,14 @@
+program TesteOtimizador;
+var
+    a, b, c : integer;
+begin
+    a := 2 + 5;
+
+    b := a * 10;
+
+    read(c);
+
+    b := c * 4;
+
+    write(b)
+end.

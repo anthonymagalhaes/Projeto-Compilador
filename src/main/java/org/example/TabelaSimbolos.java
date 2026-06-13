@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.enums.TipodeDado;
+
 import java.util.HashMap;
 
 public class TabelaSimbolos
@@ -35,6 +37,10 @@ public class TabelaSimbolos
         return null;
     }
 
+    public java.util.HashMap<String, Simbolo> getTabelaMap()
+    {
+        return tabela;
+    }
     public TabelaSimbolos getEscopoPai()
     {
         return escopoPai;

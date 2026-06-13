@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.enums.TipodeDado;
 import org.example.gen.LanguageBaseVisitor;
 import org.example.gen.LanguageParser;
 
@@ -218,5 +219,9 @@ public class LanguageCustomVisitor extends LanguageBaseVisitor<Object>
             throw new RuntimeException("Erro Semântico: Operadores lógicos (AND, OR) exigem operandos do tipo BOOLEAN.");
         }
         return TipodeDado.BOOLEAN;
+    }
+    public TabelaSimbolos getEscopoAtual()
+    {
+        return escopoAtual;
     }
 }
