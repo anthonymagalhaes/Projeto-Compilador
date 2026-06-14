@@ -25,6 +25,56 @@ public class LanguageCustomVisitor extends LanguageBaseVisitor<Object>
         System.out.println("--- Análise Semântica Concluída sem Erros Extremos ---");
         return resultado;
     }
+    @Override
+    public Object visitCmdIfCasado(LanguageParser.CmdIfCasadoContext ctx)
+    {
+        if (ctx.IF() != null || ctx.WHILE() != null)
+        {
+            TipodeDado tipoCondicao = (TipodeDado) visit(ctx.expr());
+            if (tipoCondicao != TipodeDado.BOOLEAN)
+            {
+                throw new RuntimeException("Erro Semântico: A condição do " +
+                        (ctx.IF() != null ? "IF" : "WHILE") + " deve ser BOOLEAN.");
+            }
+        }
+        return super.visitCmdIfCasado(ctx);
+    }
+
+    @Override
+    public Object visitCmdIfNaoCasado(LanguageParser.CmdIfNaoCasadoContext ctx)
+    {
+        if (ctx.IF() != null || ctx.WHILE() != null)
+        {
+            TipodeDado tipoCondicao = (TipodeDado) visit(ctx.expr());
+            if (tipoCondicao != TipodeDado.BOOLEAN)
+            {
+                throw new RuntimeException("Erro Semântico: A condição do " +
+                        (ctx.IF() != null ? "IF" : "WHILE") + " deve ser BOOLEAN.");
+            }
+        }
+        return super.visitCmdIfNaoCasado(ctx);
+    }
+
+    @Override
+    public Object visitCmdRead(LanguageParser.CmdReadContext ctx)
+    {
+        LanguageParser.ListIdContext lista = ctx.listId();
+
+        while (lista != null)
+        {
+            String nomeVar = lista.IDENTIFIER().getText();
+            Simbolo simbolo = escopoAtual.buscar(nomeVar);
+
+            if (simbolo == null)
+            {
+                throw new RuntimeException("Erro Semântico: Tentativa de leitura na variável '" +
+                        nomeVar + "', mas ela não foi declarada.");
+            }
+
+            lista = lista.listId();
+        }
+        return super.visitCmdRead(ctx);
+    }
 
     @Override
     public Object visitCmdComp(LanguageParser.CmdCompContext ctx)
@@ -104,12 +154,14 @@ public class LanguageCustomVisitor extends LanguageBaseVisitor<Object>
         {
             return TipodeDado.INTEGER;
         }
-
+        else if(ctx.CADEIA() != null)
+        {
+            return TipodeDado.STRING;
+        }
         else if (ctx.TRUE() != null || ctx.FALSE() != null)
         {
             return TipodeDado.BOOLEAN;
         }
-
         else if (ctx.IDENTIFIER() != null)
         {
             String nomeVar = ctx.IDENTIFIER().getText();
@@ -119,6 +171,7 @@ public class LanguageCustomVisitor extends LanguageBaseVisitor<Object>
                 throw new RuntimeException("Erro Semântico: Variável '" + nomeVar + "' não declarada.");
             }
             return simbolo.getTipo();
+
         }
 
         else if (ctx.ABPAR() != null)
@@ -132,6 +185,7 @@ public class LanguageCustomVisitor extends LanguageBaseVisitor<Object>
             if (tipoInterno != TipodeDado.BOOLEAN)
             {
                 throw new RuntimeException("Erro Semântico: O operador de negação '~' só aceita operandos BOOLEAN.");
+
             }
             return TipodeDado.BOOLEAN;
         }

@@ -10,6 +10,7 @@ public class GeradorCodigo extends LanguageBaseVisitor<String>
 
     private List<String> codigo = new ArrayList<>();
 
+
     private int tempCounter = 0;
     private int labelCounter = 0;
 
@@ -44,48 +45,81 @@ public class GeradorCodigo extends LanguageBaseVisitor<String>
     }
 
     @Override
-    public String visitCmdIf(LanguageParser.CmdIfContext ctx)
+    public String visitCmdIfCasado(LanguageParser.CmdIfCasadoContext ctx)
     {
-        String labelElse = gerarLabel("L_ELSE");
-        String labelEnd = gerarLabel("L_END");
-        String condicaoTemp = visit(ctx.expr());
+        if (ctx.IF() != null) {
+            String labelElse = gerarLabel("L_ELSE");
+            String labelEnd = gerarLabel("L_END");
+            String condicaoTemp = visit(ctx.expr());
 
-        adicionarInstrucao("IF " + condicaoTemp + " == 0 GOTO " + labelElse);
+            adicionarInstrucao("IF " + condicaoTemp + " == 0 GOTO " + labelElse);
+            visit(ctx.cmdIfCasado(0));
+            adicionarInstrucao("GOTO " + labelEnd);
 
-        visit(ctx.cmd(0));
-        adicionarInstrucao("GOTO " + labelEnd);
+            adicionarInstrucao(labelElse + ":");
+            visit(ctx.cmdIfCasado(1));
 
-        adicionarInstrucao(labelElse + ":");
-        if (ctx.cmd().size() > 1)
-        {
-            visit(ctx.cmd(1));
+            adicionarInstrucao(labelEnd + ":");
         }
+        else if (ctx.WHILE() != null) {
+            String labelInicio = gerarLabel("L_WHILE_IN");
+            String labelFim = gerarLabel("L_WHILE_OUT");
 
-        adicionarInstrucao(labelEnd + ":");
+            adicionarInstrucao(labelInicio + ":");
+            String condicaoTemp = visit(ctx.expr());
+            adicionarInstrucao("IF " + condicaoTemp + " == 0 GOTO " + labelFim);
 
+            visit(ctx.cmdIfCasado(0)); // Bloco DO
+            adicionarInstrucao("GOTO " + labelInicio);
+
+            adicionarInstrucao(labelFim + ":");
+        }
+        else if (ctx.cmds() != null) { // cmds
+            visit(ctx.cmds());
+        }
         return null;
     }
 
     @Override
-    public String visitCmdWhile(LanguageParser.CmdWhileContext ctx)
-    {
-        String labelStart = gerarLabel("L_WHILE_START");
-        String labelEnd = gerarLabel("L_WHILE_END");
+    public  String visitCmdIfNaoCasado(LanguageParser.CmdIfNaoCasadoContext ctx){
+        if (ctx.WHILE() != null) {
+            String labelInicio = gerarLabel("L_WHILE_IN");
+            String labelFim = gerarLabel("L_WHILE_OUT");
 
-        adicionarInstrucao(labelStart + ":");
+            adicionarInstrucao(labelInicio + ":");
+            String condicaoTemp = visit(ctx.expr());
+            adicionarInstrucao("IF " + condicaoTemp + " == 0 GOTO " + labelFim);
 
-        String condicaoTemp = visit(ctx.expr());
+            visit(ctx.cmdIfNaoCasado());
+            adicionarInstrucao("GOTO " + labelInicio);
 
-        adicionarInstrucao("IF " + condicaoTemp + " == 0 GOTO " + labelEnd);
+            adicionarInstrucao(labelFim + ":");
+        }
+        else if (ctx.ELSE() != null) {
+            String labelElse = gerarLabel("L_ELSE");
+            String labelEnd = gerarLabel("L_END");
+            String condicaoTemp = visit(ctx.expr());
 
-        visit(ctx.cmd());
+            adicionarInstrucao("IF " + condicaoTemp + " == 0 GOTO " + labelElse);
+            visit(ctx.cmdIfCasado());
+            adicionarInstrucao("GOTO " + labelEnd);
 
-        adicionarInstrucao("GOTO " + labelStart);
-        adicionarInstrucao(labelEnd + ":");
+            adicionarInstrucao(labelElse + ":");
+            visit(ctx.cmdIfNaoCasado());
 
+            adicionarInstrucao(labelEnd + ":");
+        }
+        else if (ctx.IF() != null) {
+            String labelEnd = gerarLabel("L_END");
+            String condicaoTemp = visit(ctx.expr());
+
+            adicionarInstrucao("IF " + condicaoTemp + " == 0 GOTO " + labelEnd);
+            visit(ctx.cmdIf());
+
+            adicionarInstrucao(labelEnd + ":");
+        }
         return null;
     }
-
     @Override
     public String visitCmdAtrib(LanguageParser.CmdAtribContext ctx)
     {
@@ -111,15 +145,8 @@ public class GeradorCodigo extends LanguageBaseVisitor<String>
     @Override
     public String visitElemW(LanguageParser.ElemWContext ctx)
     {
-        if (ctx.CADEIA() != null)
-        {
-            adicionarInstrucao("WRITE " + ctx.CADEIA().getText());
-        }
-        else
-        {
-            String temp = visit(ctx.expr());
-            adicionarInstrucao("WRITE " + temp);
-        }
+        String temp = visit(ctx.expr());
+        adicionarInstrucao("WRITE " + temp);
         return null;
     }
 
@@ -129,6 +156,9 @@ public class GeradorCodigo extends LanguageBaseVisitor<String>
         if (ctx.CTE() != null)
         {
             return ctx.CTE().getText();
+        }
+        else if (ctx.CADEIA() != null){
+            return ctx.CADEIA().getText();
         }
         else if (ctx.IDENTIFIER() != null)
         {

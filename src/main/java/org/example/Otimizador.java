@@ -16,6 +16,12 @@ public class Otimizador
 
         for (String linha : codigoOriginal)
         {
+            if(linha.startsWith("READ")){
+                String varLida = linha.split(" ")[1].trim();
+                constantes.remove(varLida);
+                codigoOtimizado.add(linha);
+                continue;
+            }
             if (linha.contains("GOTO") || linha.contains(":") || linha.startsWith("IF") || linha.startsWith("READ") || linha.startsWith("WRITE"))
             {
                 codigoOtimizado.add(linha);
@@ -68,6 +74,8 @@ public class Otimizador
                 if (expressao.matches("-?\\d+"))
                 {
                     constantes.put(destino, expressao);
+                }else{
+                    constantes.remove(destino);
                 }
 
                 codigoOtimizado.add(destino + " = " + expressao);

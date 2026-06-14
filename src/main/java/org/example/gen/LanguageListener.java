@@ -88,16 +88,6 @@ public interface LanguageListener extends ParseTreeListener {
 	 */
 	void exitListCmd(LanguageParser.ListCmdContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LanguageParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void enterCmd(LanguageParser.CmdContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link LanguageParser#cmd}.
-	 * @param ctx the parse tree
-	 */
-	void exitCmd(LanguageParser.CmdContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link LanguageParser#cmdIf}.
 	 * @param ctx the parse tree
 	 */
@@ -108,15 +98,35 @@ public interface LanguageListener extends ParseTreeListener {
 	 */
 	void exitCmdIf(LanguageParser.CmdIfContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LanguageParser#cmdWhile}.
+	 * Enter a parse tree produced by {@link LanguageParser#cmdIfCasado}.
 	 * @param ctx the parse tree
 	 */
-	void enterCmdWhile(LanguageParser.CmdWhileContext ctx);
+	void enterCmdIfCasado(LanguageParser.CmdIfCasadoContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LanguageParser#cmdWhile}.
+	 * Exit a parse tree produced by {@link LanguageParser#cmdIfCasado}.
 	 * @param ctx the parse tree
 	 */
-	void exitCmdWhile(LanguageParser.CmdWhileContext ctx);
+	void exitCmdIfCasado(LanguageParser.CmdIfCasadoContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link LanguageParser#cmdIfNaoCasado}.
+	 * @param ctx the parse tree
+	 */
+	void enterCmdIfNaoCasado(LanguageParser.CmdIfNaoCasadoContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LanguageParser#cmdIfNaoCasado}.
+	 * @param ctx the parse tree
+	 */
+	void exitCmdIfNaoCasado(LanguageParser.CmdIfNaoCasadoContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link LanguageParser#cmds}.
+	 * @param ctx the parse tree
+	 */
+	void enterCmds(LanguageParser.CmdsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link LanguageParser#cmds}.
+	 * @param ctx the parse tree
+	 */
+	void exitCmds(LanguageParser.CmdsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LanguageParser#cmdRead}.
 	 * @param ctx the parse tree

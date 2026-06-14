@@ -113,18 +113,6 @@ public class LanguageBaseListener implements LanguageListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCmd(LanguageParser.CmdContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitCmd(LanguageParser.CmdContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterCmdIf(LanguageParser.CmdIfContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -137,13 +125,37 @@ public class LanguageBaseListener implements LanguageListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCmdWhile(LanguageParser.CmdWhileContext ctx) { }
+	@Override public void enterCmdIfCasado(LanguageParser.CmdIfCasadoContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCmdWhile(LanguageParser.CmdWhileContext ctx) { }
+	@Override public void exitCmdIfCasado(LanguageParser.CmdIfCasadoContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCmdIfNaoCasado(LanguageParser.CmdIfNaoCasadoContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCmdIfNaoCasado(LanguageParser.CmdIfNaoCasadoContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCmds(LanguageParser.CmdsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCmds(LanguageParser.CmdsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

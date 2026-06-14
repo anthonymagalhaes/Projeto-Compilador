@@ -59,23 +59,29 @@ public interface LanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitListCmd(LanguageParser.ListCmdContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link LanguageParser#cmd}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCmd(LanguageParser.CmdContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link LanguageParser#cmdIf}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitCmdIf(LanguageParser.CmdIfContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link LanguageParser#cmdWhile}.
+	 * Visit a parse tree produced by {@link LanguageParser#cmdIfCasado}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCmdWhile(LanguageParser.CmdWhileContext ctx);
+	T visitCmdIfCasado(LanguageParser.CmdIfCasadoContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link LanguageParser#cmdIfNaoCasado}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCmdIfNaoCasado(LanguageParser.CmdIfNaoCasadoContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link LanguageParser#cmds}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCmds(LanguageParser.CmdsContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link LanguageParser#cmdRead}.
 	 * @param ctx the parse tree

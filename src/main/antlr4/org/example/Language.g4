@@ -31,21 +31,23 @@ tip : INTEGER | BOOLEAN | STRING ;
 
 cmdComp : BEGIN listCmd END ;
 
-listCmd : cmd | cmd PVIG listCmd ;
+listCmd : cmdIf | cmdIf PVIG listCmd ;
 
-cmd : cmdIf | cmdWhile | cmdRead | cmdWrite | cmdAtrib | cmdComp ;
+cmdIf : cmdIfCasado | cmdIfNaoCasado ;
 
-cmdIf : IF expr THEN cmd | IF expr THEN cmd ELSE cmd ;
+cmdIfCasado : IF expr THEN cmdIfCasado ELSE cmdIfCasado | WHILE expr DO cmdIfCasado | cmds  ;
 
-cmdWhile : WHILE expr DO cmd ;
+cmdIfNaoCasado : IF expr THEN cmdIf | IF expr THEN cmdIfCasado ELSE cmdIfNaoCasado | WHILE expr DO cmdIfNaoCasado  ;
+
+cmds : cmdRead | cmdWrite | cmdAtrib | cmdComp ;
 
 cmdRead : READ ABPAR listId FPAR ;
 
 cmdWrite : WRITE ABPAR listW FPAR ;
 
-listW : elemW | elemW VIG listW ;
+listW : elemW | listW VIG elemW ;
 
-elemW : expr | CADEIA ;
+elemW : expr ;
 
 cmdAtrib : IDENTIFIER ATRIB expr ;
 
@@ -59,6 +61,7 @@ exprMult: exprMult OPMULT termo | termo ;
 
 termo : IDENTIFIER
       | CTE
+      | CADEIA
       | ABPAR expr FPAR
       | TRUE
       | FALSE
@@ -111,6 +114,6 @@ IDENTIFIER : [a-z][a-z0-9]* {
 
 WS: [ \t\r\n]+ -> skip;
 
-COMENTARIO: '/' ~[/]* '/' -> skip;
+COMENTARIO: '//' .*? '//' -> skip;
 
 ERRO_LEXICO: . {exibirErroLexico();};
