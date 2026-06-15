@@ -22,7 +22,12 @@ public class Otimizador
                 codigoOtimizado.add(linha);
                 continue;
             }
-            if (linha.contains("GOTO") || linha.contains(":") || linha.startsWith("IF") || linha.startsWith("READ") || linha.startsWith("WRITE"))
+            if(linha.contains(":")){
+                constantes.clear();
+                codigoOtimizado.add(linha);
+                continue;
+            }
+            if (linha.contains("GOTO") || linha.startsWith("IF") || linha.startsWith("READ") || linha.startsWith("WRITE"))
             {
                 codigoOtimizado.add(linha);
                 continue;

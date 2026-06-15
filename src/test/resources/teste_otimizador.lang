@@ -1,14 +1,35 @@
-program TesteOtimizador;
+program calculoStreak;
+
 var
-    a, b, c : integer;
+    rodadas, pontuacao, recorde, streakFinal : integer;
+    bateuRecorde : boolean;
+
 begin
-    a := 2 + 5;
+    recorde := 67;
+    pontuacao := 0;
+    bateuRecorde := false;
 
-    b := a * 10;
+    write("Digite a streak final de rodadas: ");
+    read(rodadas);
+    streakFinal := rodadas;
 
-    read(c);
+    while rodadas > 0 do
+    begin
+        pontuacao := pontuacao + 10;
+        rodadas := rodadas - 1
+    end;
+    if pontuacao > recorde then
+        begin
+            bateuRecorde := true;
+            write("Parabens! Voce cravou a streak da rodada final de: ");
+            write(streakFinal)
+        end
+        else
+        begin
+            write("Fim de jogo. Streak da rodada final: ");
+            write(streakFinal)
+        end;
 
-    b := c * 4;
-
-    write(b)
+    write(" Sua pontuacao final foi: ");
+    write(pontuacao)
 end.

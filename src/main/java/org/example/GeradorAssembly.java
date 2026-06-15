@@ -11,7 +11,7 @@ public class GeradorAssembly
     private List<String> assembly = new ArrayList<>();
     private Map<String, String> mapaStrings = new HashMap<>();
     private int contadorStrings = 0;
-
+    private int contadorRelacional = 0;
     public List<String> gerar(List<String> codigo3AC, Map<String, Simbolo> tabelaGlobais)
     {
         for (String linha : codigo3AC) {
@@ -71,7 +71,7 @@ public class GeradorAssembly
 
         for (String linha : codigo3AC)
         {
-            traduzir(linha);
+            traduzir(linha,tabelaGlobais);
         }
 
         assembly.add("    mov ah, 4Ch");
@@ -82,7 +82,7 @@ public class GeradorAssembly
         return assembly;
     }
 
-    private void traduzir(String linha)
+    private void traduzir(String linha, Map<String, Simbolo> tabelaGlobais)
     {
         linha = linha.trim();
         if (linha.endsWith(":"))
@@ -100,12 +100,63 @@ public class GeradorAssembly
         if (linha.startsWith("IF "))
         {
             String[] partes = linha.split(" ");
-            String condicaoTemp = partes[1];
-            String label = partes[5];
+            if(partes.length == 6){
+                String opEsq = partes[1];
+                String operator = partes[2];
+                String opDir = partes[3];
+                String label = partes[5];
 
-            assembly.add("    mov ax, word ptr [" + condicaoTemp + "]");
-            assembly.add("    cmp ax, 0");
-            assembly.add("    je " + label);
+                assembly.add("    mov ax, word ptr [" + opEsq + "]");
+
+                if(opDir.matches("-?\\d+")){
+                    assembly.add("    cmp ax, " + opDir);
+
+                }else{
+                    assembly.add("    cmp ax, word ptr [" + opDir + "]");
+                }
+
+                switch (operator) {
+                    case "<":
+                        assembly.add("    jl " + label);
+                        break;
+                    case ">":
+                        assembly.add("    jg " + label);
+                        break;
+                    case "==":
+                        assembly.add("    je " + label);
+                        break;
+                    case "<=":
+                        assembly.add("    jle " + label);
+                        break;
+                    case ">=":
+                        assembly.add("    jge " + label);
+                        break;
+                    case "!=":
+                        assembly.add("    jne " + label);
+                        break;
+                    default:
+                        System.out.println("Erro: Operador relacional desconhecido: " + operator);
+                        break;
+                }
+            }
+            else if(partes.length == 4){
+            String condicaoTemp = partes[1];
+            String label = partes[3];
+
+            boolean res = isBooleano(condicaoTemp, tabelaGlobais);
+
+            if(res){
+                assembly.add("    mov al, byte ptr [" + condicaoTemp + "]");
+                assembly.add("    cmp al, 0");
+                assembly.add("    je " + label);
+            }else {
+                assembly.add("    mov ax, word ptr [" + condicaoTemp + "]");
+                assembly.add("    cmp ax, 0");
+                assembly.add("    je " + label);
+            }
+
+
+            }
             return;
         }
 
@@ -125,8 +176,8 @@ public class GeradorAssembly
                 assembly.add("    lea dx, " + label);
                 assembly.add("    mov ah, 09h");
                 assembly.add("    int 21h");
-            } else { // É um NÚMERO ou VARIÁVEL (x, y)
-                assembly.add("    mov ax, word ptr [" + argumento + "]");
+            } else {
+                assembly.add("    push word ptr [" + argumento + "]");
                 assembly.add("    call _print_integer");
             }
             return;
@@ -138,14 +189,18 @@ public class GeradorAssembly
             String destino = partes[0].trim();
             String expressao = partes[1].trim();
             String[] tokensExp = expressao.split(" ");
+            boolean isDestinoBooleano = isBooleano(destino,tabelaGlobais);
+
+            String registrador = isDestinoBooleano ? "al" : "ax";
+            String ponteiro = isDestinoBooleano ? "byte ptr" : "word ptr";
 
             if (tokensExp.length == 1)
             {
                 if (tokensExp[0].matches("-?\\d+")) {
-                    assembly.add("    mov word ptr [" + destino + "], " + tokensExp[0]);
+                    assembly.add("    mov " + ponteiro + " [" + destino + "], " + tokensExp[0]);
                 } else {
-                    assembly.add("    mov ax, word ptr [" + tokensExp[0] + "]");
-                    assembly.add("    mov word ptr [" + destino + "], ax");
+                    assembly.add("    mov " + registrador + ", " + ponteiro + " [" + tokensExp[0] + "]");
+                    assembly.add("    mov " + ponteiro + " [" + destino + "], " + registrador);
                 }
             }else if (tokensExp.length == 3 && tokensExp[1].equals("<<")) {
                 assembly.add("    mov ax, word ptr [" + tokensExp[0] + "]");
@@ -157,32 +212,69 @@ public class GeradorAssembly
                 String opEsq = tokensExp[0];
                 String operador = tokensExp[1];
                 String opDir = tokensExp[2];
+                if (opEsq.matches("-?\\d+")) {
+                    assembly.add("    mov ax, " + opEsq);
+                } else {
+                    assembly.add("    mov ax, word ptr [" + opEsq + "]");
+                }
 
-                assembly.add("    mov ax, word ptr [" + opEsq + "]");
+                String formatoOpDir = opDir.matches("-?\\d+") ? opDir : "word ptr [" + opDir + "]";
 
                 switch (operador) {
                     case "+":
-                        assembly.add("    add ax, word ptr [" + opDir + "]");
+                        assembly.add("    add ax, " + formatoOpDir);
                         break;
                     case "-":
-                        assembly.add("    sub ax, word ptr [" + opDir + "]");
+                        assembly.add("    sub ax, " + formatoOpDir);
                         break;
                     case "*":
-                        assembly.add("    imul word ptr [" + opDir + "]");
+                        assembly.add("    imul " + formatoOpDir);
+                        break;
+                    case ">":
+                    case "<":
+                    case "==":
+                    case ">=":
+                    case "<=":
+                    case "!=":
+                        String labelTrue = "SET_TRUE_" + contadorRelacional;
+                        String labelFim = "SET_FIM_" + contadorRelacional;
+                        contadorRelacional++;
+
+                        assembly.add("    cmp ax, " + formatoOpDir);
+                        if (operador.equals(">")) assembly.add("    jg " + labelTrue);
+                        else if (operador.equals("<")) assembly.add("    jl " + labelTrue);
+                        else if (operador.equals("==")) assembly.add("    je " + labelTrue);
+                        else if (operador.equals(">=")) assembly.add("    jge " + labelTrue);
+                        else if (operador.equals("<=")) assembly.add("    jle " + labelTrue);
+                        else if (operador.equals("!=")) assembly.add("    jne " + labelTrue);
+
+                        assembly.add("    mov ax, 0");
+                        assembly.add("    jmp " + labelFim);
+                        assembly.add(labelTrue + ":");
+                        assembly.add("    mov ax, 1");
+
+                        assembly.add(labelFim + ":");
                         break;
                 }
 
-                assembly.add("    mov word ptr [" + destino + "], ax");
+                if(isDestinoBooleano) {
+                    assembly.add("    mov byte ptr [" + destino + "], al");
+                } else {
+                    assembly.add("    mov word ptr [" + destino + "], ax");
+                }
             }
         }
     }
     private void injetarFuncoesIOnativas()
     {
         assembly.add("_print_integer PROC");
+        assembly.add("    push bp");
+        assembly.add("    mov bp, sp");
         assembly.add("    push ax");
         assembly.add("    push bx");
         assembly.add("    push cx");
         assembly.add("    push dx");
+        assembly.add("    mov ax, [bp+4]");
         assembly.add("    mov cx, 0");
         assembly.add("    cmp ax, 0");
         assembly.add("    jge print_loop_1");
@@ -210,7 +302,8 @@ public class GeradorAssembly
         assembly.add("    pop cx");
         assembly.add("    pop bx");
         assembly.add("    pop ax");
-        assembly.add("    ret");
+        assembly.add("    pop bp");
+        assembly.add("    ret 2");
         assembly.add("_print_integer ENDP");
         assembly.add("");
         assembly.add("_read_integer PROC");
@@ -247,7 +340,9 @@ public class GeradorAssembly
         assembly.add("    ret");
         assembly.add("_read_integer ENDP");
     }
-
+    private boolean isBooleano(String nomeVariavel, Map<String, Simbolo> tabelaGlobais) {
+        return tabelaGlobais.containsKey(nomeVariavel) && tabelaGlobais.get(nomeVariavel).getTipo() == TipodeDado.BOOLEAN;
+    }
     public void mostrarAssembly()
     {
         System.out.println("-- Código Assembly --");
