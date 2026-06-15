@@ -1,48 +1,48 @@
 package org.example;
 
 import org.example.enums.TipodeDado;
-
 import java.util.HashMap;
 
 public class TabelaSimbolos
 {
-    private HashMap<String, Simbolo> tabela;
-    private TabelaSimbolos escopoPai;
+    private HashMap<String, Simbolo> mapaVariaveis;
+    private TabelaSimbolos nivelAnterior;
 
-    public TabelaSimbolos(TabelaSimbolos escopoPai)
+    public TabelaSimbolos(TabelaSimbolos nivelAnterior)
     {
-        this.tabela = new HashMap<>();
-        this.escopoPai = escopoPai;
+        this.mapaVariaveis = new HashMap<>();
+        this.nivelAnterior = nivelAnterior;
     }
 
-    public void inserir(String nome, TipodeDado tipo, int deslocamento)
+    public void inserir(String nomeVar, TipodeDado tipoVar, int offsetMemoria)
     {
-        if (tabela.containsKey(nome))
-        {
-            throw new RuntimeException("Erro Semântico: A variável '" + nome + "' já foi declarada neste escopo.");
-        }
-        tabela.put(nome, new Simbolo(nome, tipo, deslocamento));
+        if (mapaVariaveis.containsKey(nomeVar))
+            throw new RuntimeException("Erro Semântico: A variável '" + nomeVar + "' já foi declarada antes neste bloco.");
+
+        Simbolo novoSimbolo = new Simbolo(nomeVar, tipoVar, offsetMemoria);
+        mapaVariaveis.put(nomeVar, novoSimbolo);
     }
 
-    public Simbolo buscar(String nome)
+    public Simbolo buscar(String nomeVar)
     {
-        if (tabela.containsKey(nome))
-        {
-            return tabela.get(nome);
-        }
-        if (escopoPai != null)
-        {
-            return escopoPai.buscar(nome);
-        }
+        Simbolo encontrado = mapaVariaveis.get(nomeVar);
+
+        if (encontrado != null)
+            return encontrado;
+
+        if (nivelAnterior != null)
+            return nivelAnterior.buscar(nomeVar);
+
         return null;
     }
 
-    public java.util.HashMap<String, Simbolo> getTabelaMap()
+    public HashMap<String, Simbolo> getTabelaMap()
     {
-        return tabela;
+        return mapaVariaveis;
     }
+
     public TabelaSimbolos getEscopoPai()
     {
-        return escopoPai;
+        return nivelAnterior;
     }
 }
