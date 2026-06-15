@@ -352,4 +352,7 @@ public class GeradorAssembly
         }
         System.out.println("----------------");
     }
+    public List<String> getAssembly(){
+        return assembly;
+    }
 }

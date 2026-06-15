@@ -1,6 +1,9 @@
 package org.example;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -13,6 +16,7 @@ public class Main {
 
     private static final String DIRBASE = "src/test/resources/";
     private static final String EXTENSION = "lang";
+    private static final String TARGETBASE = "src/test/responses/";
 
     public static void main(String[] args) {
         try {
@@ -51,7 +55,9 @@ public class Main {
             LanguageParser parser = new LanguageParser(tokens);
 
             LanguageParser.ProgContext arvore = parser.prog();
-
+            if (parser.getNumberOfSyntaxErrors() > 0) {
+                throw new RuntimeException("Compilação abortada: Foram encontrados erros léxicos ou sintáticos.");
+            }
             LanguageCustomVisitor visitor = new LanguageCustomVisitor();
 
             visitor.visit(arvore);
@@ -67,6 +73,15 @@ public class Main {
             GeradorAssembly geradorAsm = new GeradorAssembly();
             geradorAsm.gerar(codigoOtimizado, visitor.getEscopoAtual().getTabelaMap());
             geradorAsm.mostrarAssembly();
+
+            String nomeArquivoSaida = TARGETBASE + files[0].replace("." + EXTENSION, ".asm");
+            java.io.File diretorioSaida = new java.io.File(TARGETBASE);
+            if (!diretorioSaida.exists()) {
+                diretorioSaida.mkdirs();
+            }
+
+            Files.write(Paths.get(nomeArquivoSaida), geradorAsm.getAssembly());
+            System.out.println("-> Arquivo assembly gerado com sucesso em: " + nomeArquivoSaida);
 
         } catch (RuntimeException | IOException e) {
             System.err.println(e.getMessage());
