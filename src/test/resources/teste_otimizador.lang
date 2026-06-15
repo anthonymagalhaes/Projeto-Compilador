@@ -1,17 +1,15 @@
-program calculoStreak;
+program calculoRodadas;
 
 var
-    rodadas, pontuacao, recorde, streakFinal : integer;
-    bateuRecorde : boolean;
+    rodadas, pontuacao, recorde: integer;
 
 begin
     recorde := 67;
     pontuacao := 0;
-    bateuRecorde := false;
 
-    write("Digite a streak final de rodadas: ");
+    write("Digite a quantidade de rodadas: ");
     read(rodadas);
-    streakFinal := rodadas;
+
 
     while rodadas > 0 do
     begin
@@ -20,14 +18,11 @@ begin
     end;
     if pontuacao > recorde then
         begin
-            bateuRecorde := true;
-            write("Parabens! Voce cravou a streak da rodada final de: ");
-            write(streakFinal)
+            write("Parabens! ")
         end
         else
         begin
-            write("Fim de jogo. Streak da rodada final: ");
-            write(streakFinal)
+            write("Fim de jogo. ")
         end;
 
     write(" Sua pontuacao final foi: ");
